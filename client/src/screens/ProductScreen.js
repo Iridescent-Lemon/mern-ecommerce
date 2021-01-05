@@ -1,17 +1,15 @@
-import { React, useEffect, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Row, Col, Image, ListGroup, Card, Button } from 'react-bootstrap';
 import Rating from '../components/Rating';
-import products from '../products';
+import useFetch from '../custom/useFetch';
 
 const ProductScreen = () => {
-	const [prodItem, setProductItem] = useState('');
-	const { id } = useParams();
-
-	useEffect(() => {
-		const product = products.find((prod) => prod._id === id);
-		setProductItem(product);
-	}, [id]);
+	const { id } = useParams();	
+	
+	const { loading, products } = useFetch(
+		`https://server-mern.run-us-west2.goorm.io/api/products/${id}`
+	);
 
 	return (
 		<>
@@ -20,24 +18,21 @@ const ProductScreen = () => {
 			</Link>
 			<Row>
 				<Col md={6}>
-					<Image src={prodItem.image} alt={prodItem.name} fluid />
+					<Image src={products.image} alt={products.name} fluid />
 				</Col>
 				<Col md={3}>
 					<ListGroup variant="flush">
 						<ListGroup.Item>
-							<h2>{prodItem.name}</h2>
+							<h2>{products.name}</h2>
 						</ListGroup.Item>
 						<ListGroup.Item>
-							<Rating
-								value={prodItem.rating}
-								text={`${prodItem.numReviews} reviews`}
-							/>
+							<Rating value={products.rating} text={`${products.numReviews} reviews`} />
 						</ListGroup.Item>
 						<ListGroup.Item>
-							<strong>Price:</strong> ${prodItem.price}
+							<strong>Price:</strong> ${products.price}
 						</ListGroup.Item>
 						<ListGroup.Item>
-							<strong>Description:</strong> {prodItem.description}
+							<strong>Description:</strong> {products.description}
 						</ListGroup.Item>
 					</ListGroup>
 				</Col>
@@ -48,7 +43,7 @@ const ProductScreen = () => {
 								<Row>
 									<Col>Price: </Col>
 									<Col>
-										<h4>{prodItem.price}</h4>
+										<h4>{products.price}</h4>
 									</Col>
 								</Row>
 							</ListGroup.Item>
@@ -57,7 +52,7 @@ const ProductScreen = () => {
 									<Col>Status: </Col>
 									<Col>
 										<h5>
-											{prodItem.countInStock > 0
+											{products.countInStock > 0
 												? 'Available'
 												: 'Out of Stock'}
 										</h5>
@@ -68,7 +63,7 @@ const ProductScreen = () => {
 								<Button
 									className="btn-block"
 									type="button"
-									disabled={prodItem.countInStock === 0}
+									disabled={products.countInStock === 0}
 								>
 									Add to Cart
 								</Button>
